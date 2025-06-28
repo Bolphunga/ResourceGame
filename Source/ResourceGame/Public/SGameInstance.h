@@ -14,11 +14,5 @@ UCLASS()
 class RESOURCEGAME_API ASGameInstance : public ALevelInstance
 {
 	GENERATED_BODY()
-
-public:
-
-	TArray<FGhostFrame> LastGhostMemory;
-	
-	TArray<TArray<FGhostFrame>> AllGhostRuns;
 	
 };

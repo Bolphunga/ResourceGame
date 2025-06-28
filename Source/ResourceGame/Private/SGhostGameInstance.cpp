@@ -3,3 +3,7 @@
 
 #include "SGhostGameInstance.h"
 
+void USGhostGameInstance::AddGhostRun(const TArray<FGhostFrame>& RunData)
+{
+	AllGhostRuns.Add(RunData);
+}

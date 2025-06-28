@@ -19,8 +19,6 @@ public:
 
 	virtual void BeginPlay() override;
 
-	virtual void PostInitializeComponents() override;
-
 	UFUNCTION(BlueprintCallable)
 	void SpawnGhostWithPath();
 
@@ -29,5 +27,8 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Ghost")
 	TSubclassOf<ASGhostCharacter> GhostClass;
+
+	UPROPERTY(VisibleAnywhere)
+	TArray<FGhostFrame> LastGhostMemory;
 	
 };

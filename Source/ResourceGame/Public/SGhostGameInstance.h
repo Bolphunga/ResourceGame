@@ -17,9 +17,9 @@ class RESOURCEGAME_API USGhostGameInstance : public UGameInstance
 
 public:
 
-	UPROPERTY(VisibleAnywhere)
-	TArray<FGhostFrame> LastGhostMemory;
-
 	TArray<TArray<FGhostFrame>> AllGhostRuns;
+
+	UFUNCTION(BlueprintCallable, Category = "SGhostGameInstance")
+	void AddGhostRun(const TArray<FGhostFrame>& RunData);
 	
 };
