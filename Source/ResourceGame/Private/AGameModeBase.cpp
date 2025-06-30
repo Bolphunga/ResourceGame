@@ -21,6 +21,9 @@ void AAGameModeBase::SpawnGhostWithPath()
 	
 	USGhostGameInstance* GI = Cast<USGhostGameInstance>(GetGameInstance());
 	if (!GI) return;
+
+	const int32 TotalRuns = GI->AllGhostRuns.Num();
+	int32 Index = 0;
 	
 	for (const TArray<FGhostFrame> GhostRun : GI->AllGhostRuns)
 	{
@@ -38,7 +41,24 @@ void AAGameModeBase::SpawnGhostWithPath()
 		if (Ghost)
 		{
 			Ghost->SetGhostPath(GhostRun);
+
+			// 🔥 NEW: Set ghost age
+			float FadeAmount = (float)Index / (float)(TotalRuns - 1); // 0 = newest, 1 = oldest
+			Ghost->SetGhostFade(FadeAmount); // We'll create this next
+			Index++;
+			
+			SpawnedGhosts.Add(Ghost);
 		}
+	}
+
+	// After loop that spawns ghosts
+	while (SpawnedGhosts.Num() > 5)
+	{
+		if (SpawnedGhosts[0])
+		{
+			SpawnedGhosts[0]->Destroy();
+		}
+		SpawnedGhosts.RemoveAt(0);
 	}
 }
 
@@ -58,7 +78,6 @@ void AAGameModeBase::EndCurrentRun()
                 }
 			}
 		}
-
 	//Level restart
 	UGameplayStatics::OpenLevel(GetWorld(), FName(*GetWorld()->GetName()), false);
 }

@@ -30,5 +30,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 	TArray<FGhostFrame> LastGhostMemory;
-	
+
+	UPROPERTY(VisibleAnywhere)
+	TArray<ASGhostCharacter*> SpawnedGhosts;
 };

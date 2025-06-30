@@ -18,6 +18,15 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetGhostPath(const TArray<FGhostFrame>& InPath);
+
+	UFUNCTION(BlueprintCallable)
+	void SetGhostFade(float AgeNormalized);
+
+	FVector LastLocation;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Animation")
+	float GhostSpeed = 0.0f;
+
 	
 
 protected:
@@ -32,10 +41,7 @@ protected:
 	int32 CurrentFrameIndex;
 	
 	float GhostPlaybackTime;
-	
-	FVector LastLocation;
-	
-	float GhostSpeed;
+
 
 	
 public:	

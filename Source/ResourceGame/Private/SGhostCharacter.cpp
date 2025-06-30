@@ -26,6 +26,24 @@ void ASGhostCharacter::SetGhostPath(const TArray<FGhostFrame>& InPath)
 	}
 }
 
+void ASGhostCharacter::SetGhostFade(float AgeNormalized)
+{
+	USkeletalMeshComponent* GhostMesh = GetMesh();
+	if (!GhostMesh) return;
+
+	//Oldest ghost = 0.25 opacity
+	float Opacity = FMath::Lerp(1.0f, 0.25f, AgeNormalized); 
+
+	for (int32 i = 0; i < GhostMesh->GetNumMaterials(); i++)
+	{
+		UMaterialInstanceDynamic* DynMat = GhostMesh->CreateAndSetMaterialInstanceDynamic(i);
+		if (DynMat)
+		{
+			DynMat->SetScalarParameterValue(TEXT("Opacity"), Opacity);
+		}
+	}
+}
+
 void ASGhostCharacter::UpdateGhostPosition(float DeltaTime)
 {
 	if (GhostPath.Num() < 2 || (CurrentFrameIndex >= GhostPath.Num()-1))
@@ -50,6 +68,10 @@ void ASGhostCharacter::UpdateGhostPosition(float DeltaTime)
 	{
 		CurrentFrameIndex++;
 	}
+
+	GhostSpeed = (GetActorLocation() - LastLocation).Size() / DeltaTime;
+	LastLocation = GetActorLocation();
+
 }
 
 // Called when the game starts or when spawned
