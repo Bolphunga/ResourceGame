@@ -5,6 +5,7 @@
 
 #include "FGhostTypes.h"
 #include "VectorTypes.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 ASGhostCharacter::ASGhostCharacter()
@@ -47,7 +48,13 @@ void ASGhostCharacter::SetGhostFade(float AgeNormalized)
 void ASGhostCharacter::UpdateGhostPosition(float DeltaTime)
 {
 	if (GhostPath.Num() < 2 || (CurrentFrameIndex >= GhostPath.Num()-1))
+	{
+		if (GetMesh())
+		{
+			GetMesh()->bPauseAnims = true;
+		}
 		return;
+	}
 
 	GhostPlaybackTime += DeltaTime;
 	const FGhostFrame CurrentFrame = GhostPath[CurrentFrameIndex];
@@ -60,9 +67,17 @@ void ASGhostCharacter::UpdateGhostPosition(float DeltaTime)
 
 	FVector NewLocation = FMath::Lerp(CurrentFrame.Location, NextFrame.Location, Alpha);
 	FRotator NewRotation = FMath::Lerp(CurrentFrame.Rotation, NextFrame.Rotation, Alpha);
-		
+	
+	FVector DeltaMove = NewLocation - GetActorLocation();
+	CalculatedVelocity = DeltaMove / DeltaTime;
+    
+	GetCharacterMovement()->Velocity = CalculatedVelocity;
+	
 	SetActorLocation(NewLocation);
 	SetActorRotation(NewRotation);
+	
+	/*AddActorWorldOffset(DeltaMove, true);
+	SetActorRotation(NewRotation);*/
 	
 	if (GhostPlaybackTime >= NextFrame.TimeStamp)
 	{
@@ -71,13 +86,18 @@ void ASGhostCharacter::UpdateGhostPosition(float DeltaTime)
 
 	GhostSpeed = (GetActorLocation() - LastLocation).Size() / DeltaTime;
 	LastLocation = GetActorLocation();
-
 }
 
 // Called when the game starts or when spawned
 void ASGhostCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+	GetMesh()->bOnlyAllowAutonomousTickPose = false;
+	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
+	GetMesh()->SetUpdateAnimationInEditor(true);
+
 	
 }
 

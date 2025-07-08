@@ -27,6 +27,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Animation")
 	float GhostSpeed = 0.0f;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Animation")
+	FVector CalculatedVelocity;
+
 	
 
 protected:
