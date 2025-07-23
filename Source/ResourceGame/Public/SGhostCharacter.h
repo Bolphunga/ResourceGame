@@ -13,14 +13,12 @@ class RESOURCEGAME_API ASGhostCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
-	ASGhostCharacter();
 
 	UFUNCTION(BlueprintCallable)
 	void SetGhostPath(const TArray<FGhostFrame>& InPath);
 
-	UFUNCTION(BlueprintCallable)
-	void SetGhostFade(float AgeNormalized);
+	/*UFUNCTION(BlueprintCallable)
+	void SetGhostFade(float AgeNormalized);*/
 
 	FVector LastLocation;
 
@@ -41,9 +39,9 @@ protected:
 	
 	TArray<FGhostFrame> GhostPath;
 	
-	int32 CurrentFrameIndex;
+	int32 CurrentFrameIndex = 0.f;
 	
-	float GhostPlaybackTime;
+	float GhostPlaybackTime = 0.f;
 
 
 	

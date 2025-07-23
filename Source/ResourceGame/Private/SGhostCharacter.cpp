@@ -4,16 +4,8 @@
 #include "SGhostCharacter.h"
 
 #include "FGhostTypes.h"
-#include "VectorTypes.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
-// Sets default values
-ASGhostCharacter::ASGhostCharacter()
-{
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
-}
 
 void ASGhostCharacter::SetGhostPath(const TArray<FGhostFrame>& InPath)
 {
@@ -23,16 +15,19 @@ void ASGhostCharacter::SetGhostPath(const TArray<FGhostFrame>& InPath)
 
 	if (!GhostPath.IsEmpty())
 	{
+		// Offset the first location by a random value to prevent collision with the original
+		//float OffsetByIndex = (FMath::RandRange(-1.5f, 1.5f ) + 0.5f )* -100.f;
+		
 		SetActorLocationAndRotation(GhostPath[0].Location, GhostPath[0].Rotation);
 	}
 }
 
-void ASGhostCharacter::SetGhostFade(float AgeNormalized)
+/*void ASGhostCharacter::SetGhostFade(float AgeNormalized)
 {
 	USkeletalMeshComponent* GhostMesh = GetMesh();
 	if (!GhostMesh) return;
 
-	//Oldest ghost = 0.25 opacity
+	// Oldest ghost = 0.25 opacity
 	float Opacity = FMath::Lerp(1.0f, 0.25f, AgeNormalized); 
 
 	for (int32 i = 0; i < GhostMesh->GetNumMaterials(); i++)
@@ -43,15 +38,17 @@ void ASGhostCharacter::SetGhostFade(float AgeNormalized)
 			DynMat->SetScalarParameterValue(TEXT("Opacity"), Opacity);
 		}
 	}
-}
+}*/
 
 void ASGhostCharacter::UpdateGhostPosition(float DeltaTime)
 {
+	// Don't update/stop updating positing if there aren't enough frames, or it's an early frame, then pause animation
 	if (GhostPath.Num() < 2 || (CurrentFrameIndex >= GhostPath.Num()-1))
 	{
 		if (GetMesh())
 		{
 			GetMesh()->bPauseAnims = true;
+			SetActorTickEnabled(false);
 		}
 		return;
 	}
@@ -70,20 +67,19 @@ void ASGhostCharacter::UpdateGhostPosition(float DeltaTime)
 	
 	FVector DeltaMove = NewLocation - GetActorLocation();
 	CalculatedVelocity = DeltaMove / DeltaTime;
-    
+
+	// Set the character's to use for animation
 	GetCharacterMovement()->Velocity = CalculatedVelocity;
 	
 	SetActorLocation(NewLocation);
 	SetActorRotation(NewRotation);
-	
-	/*AddActorWorldOffset(DeltaMove, true);
-	SetActorRotation(NewRotation);*/
 	
 	if (GhostPlaybackTime >= NextFrame.TimeStamp)
 	{
 		CurrentFrameIndex++;
 	}
 
+	// We exposed these values to BP because we need them in the AnimBP to freeze the movement
 	GhostSpeed = (GetActorLocation() - LastLocation).Size() / DeltaTime;
 	LastLocation = GetActorLocation();
 }
@@ -97,8 +93,6 @@ void ASGhostCharacter::BeginPlay()
 	GetMesh()->bOnlyAllowAutonomousTickPose = false;
 	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
 	GetMesh()->SetUpdateAnimationInEditor(true);
-
-	
 }
 
 // Called every frame
